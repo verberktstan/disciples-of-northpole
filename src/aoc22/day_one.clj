@@ -20,11 +20,16 @@
    (reduce max calory-sums))
   ([calory-sums n]
    (->> calory-sums
-        (sort-by identity >)
+        (sort >)
         (take n)
         (reduce +))))
 
 (comment
+  ;; Part one
+  ;; Return the highest number of calories carried by a single elf.
   (-> "resources/day-one-input.txt" read-and-sum max-calories)
+
+  ;; Part two
+  ;; Return the sum of the 3 highest number of calories.
   (-> "resources/day-one-input.txt" read-and-sum (max-calories 3))
   )
