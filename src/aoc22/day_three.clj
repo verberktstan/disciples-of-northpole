@@ -2,11 +2,11 @@
   (:require [aoc22.utils :as u]
             [clojure.set :as set]))
 
-(defn split-ruchsack
-  "Returns a vector with to sequences of items in the ruchsack, one for each compartiment."
-  [ruchsack]
-  (let [compartiment-size (-> ruchsack count (/ 2) int)]
-    (split-at compartiment-size ruchsack)))
+(defn split-rucksack
+  "Returns a vector with to sequences of items in the rucksack, one for each compartiment."
+  [rucksack]
+  (let [compartiment-size (-> rucksack count (/ 2) int)]
+    (split-at compartiment-size rucksack)))
 
 (defn find-shared-item
   "Returns the item that is present in both compartiments."
@@ -23,9 +23,11 @@
     (if (< i 97) (- i 38) (- i 96))))
 
 (comment
+  ;; Part one
+  ;; Sum the priorities of all items that appear in both compartiments of each rucksack.
   (->> "resources/day-three-input.txt"
        u/read-lines
-       (map split-ruchsack)
+       (map split-rucksack)
        (map find-shared-item)
        (map priority)
        (reduce +))
