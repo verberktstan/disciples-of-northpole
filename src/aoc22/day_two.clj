@@ -1,5 +1,5 @@
 (ns aoc22.day-two
-  (:require [aoc22.utils :refer [read-lines]]
+  (:require [aoc22.utils :as u]
             [clojure.string :as str]))
 
 (def parse-play
@@ -9,18 +9,16 @@
 
 (def shape-score {:rock 1 :paper 2 :scissors 3})
 
-(def first-key (comp key first))
-
 (defn play-that-beats [opponents-play]
   (->> beats?
-       (filter (comp #{opponents-play} val))
-       first-key))
+       (filter (u/val= opponents-play))
+       u/first-key))
 
 (defn play-that-loses-from [opponents-play]
   (->> beats?
-       (remove (comp #{opponents-play} val))
-       (remove (comp #{opponents-play} key))
-       first-key))
+       (remove (u/val= opponents-play))
+       (remove (u/key= opponents-play))
+       u/first-key))
 
 (defn determine-play [i-should opponents-play]
   (condp = i-should
@@ -50,7 +48,7 @@
   ;; Part two
   ;; Return the sum of the scores for all the rounds
   (->> "resources/day-two-input.txt"
-       read-lines
+       u/read-lines
        (map parse-plays)
        (map calculate-score)
        (reduce +))
