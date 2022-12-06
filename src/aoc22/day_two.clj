@@ -10,21 +10,41 @@
                     "Y" :paper
                     "Z" :scissors})
 
-(def beats {:rock     :scissors
-            :paper    :rock
-            :scissors :paper})
+(def beats? {:rock     :scissors
+             :paper    :rock
+             :scissors :paper})
 
-(def score-for-my-play {:rock 1 :paper 2 :scissors 3})
+(def shape-score {:rock 1 :paper 2 :scissors 3})
+
+(defn result [{:keys [my-play opponents-play]}]
+  (cond
+    (= my-play opponents-play)
+    :draw
+
+    (= (beats? my-play) opponents-play)
+    :win
+
+    :else
+    :loss))
+
+(def round-score {:loss 0
+                  :draw 3
+                  :win  6})
 
 (defn parse-plays [s]
   (let [[opponent me] (str/split s #" ")
-        play          (parse-my-play me)
+        my-play       (parse-my-play me)
         op-play       (parse-opponents-play opponent)]
-    {:my-play           play
-     :opponents-play    op-play
-     :score-for-my-play (score-for-my-play play)
-     :i-won?            (= (beats play) op-play)}))
+    {:my-play        my-play
+     :opponents-play op-play}))
+
+(defn calculate-score [{:keys [my-play] :as plays}]
+  (+ (shape-score my-play) (-> plays result round-score)))
 
 (comment
-  (map parse-plays (read-lines "resources/day-two-input.txt"))
+  (->> "resources/day-two-input.txt"
+       read-lines
+       (map parse-plays)
+       (map calculate-score)
+       (reduce +))
   )
