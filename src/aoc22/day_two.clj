@@ -9,16 +9,24 @@
 
 (def shape-score {:rock 1 :paper 2 :scissors 3})
 
+(def first-key (comp key first))
+
+(defn play-that-beats [opponents-play]
+  (->> beats?
+       (filter (comp #{opponents-play} val))
+       first-key))
+
+(defn play-that-loses-from [opponents-play]
+  (->> beats?
+       (remove (comp #{opponents-play} val))
+       (remove (comp #{opponents-play} key))
+       first-key))
+
 (defn determine-play [i-should opponents-play]
   (condp = i-should
     :draw opponents-play
-    :win  (-> (filter (comp #{opponents-play} val) beats?)
-              first
-              key)
-    :lose (->> (remove (comp #{opponents-play} val) beats?)
-               (remove (comp #{opponents-play} key))
-               first
-               key)))
+    :win  (play-that-beats opponents-play)
+    :lose (play-that-loses-from opponents-play)))
 
 (defn result [{:keys [my-play opponents-play]}]
   (cond
