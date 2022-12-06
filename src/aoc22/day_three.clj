@@ -31,4 +31,13 @@
        (map find-shared-item)
        (map priority)
        (reduce +))
+
+  ;; Part two
+  ;; In groups of 3 rucksacks, find the shared item between those 3, and sum their priority.
+  (->> "resources/day-three-input.txt"
+       u/read-lines
+       (partition 3)
+       (map find-shared-item)
+       (map priority)
+       (reduce +))
   )
