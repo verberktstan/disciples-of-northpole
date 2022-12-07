@@ -1,7 +1,7 @@
 (ns aoc22.day-one
   (:require
    [clojure.edn :as edn]
-   [aoc22.utils :refer [read-lines]]))
+   [aoc22.utils :as u]))
 
 (defn- sum-calories-per-elf [lines]
   (->> lines
@@ -9,9 +9,9 @@
        (partition-by nil?)
        (keep (partial reduce +))))
 
-(def read-and-sum (comp sum-calories-per-elf read-lines))
+(def ^:private read-and-sum (comp sum-calories-per-elf u/read-lines))
 
-(defn sum-max-calories
+(defn- sum-max-calories
   ([calory-sums]
    (reduce max calory-sums))
   ([calory-sums n]
@@ -20,12 +20,7 @@
         (take n)
         (reduce +))))
 
-(comment
-  ;; Part one
-  ;; Return the highest number of calories carried by a single elf.
-  (-> "resources/day-one-input.txt" read-and-sum sum-max-calories)
-
-  ;; Part two
-  ;; Return the sum of the 3 highest number of calories.
-  (-> "resources/day-one-input.txt" read-and-sum (sum-max-calories 3))
-  )
+(def -main
+  (u/wrap-main
+    {:part-one #(-> "resources/day-one-input.txt" read-and-sum sum-max-calories)
+     :part-two #(-> "resources/day-one-input.txt" read-and-sum (sum-max-calories 3))}))
