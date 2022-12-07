@@ -14,23 +14,20 @@
 (defn- range-inc-end [start end]
   (range start (inc end)))
 
+(def ^:private range-regex #"(\d+)\-(\d+)")
+
 (defn- ->range [s]
-  (->> s
-       (re-find #"(\d+)\-(\d+)")
-       rest
+  (->> (u/regex-groups range-regex s)
        (map edn/read-string)
        (apply range-inc-end)))
 
-(defn- split-pair [s]
-  (->> s
-       (re-matches #"(\d+\-\d+),(\d+\-\d+)")
-       rest))
+(def ^:private pair-regex #"(\d+\-\d+),(\d+\-\d+)")
 
 (defn- count-ranges [keep-fn]
   (fn count-ranges* []
     (->> "resources/day-four-input.txt"
          u/read-lines
-         (map split-pair)
+         (map (partial u/regex-groups pair-regex))
          (map (partial mapv ->range))
          (map (partial map set))
          (keep keep-fn)

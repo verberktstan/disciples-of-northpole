@@ -20,3 +20,5 @@
       (if f
         (println (f))
         (println "Can't run that part!")))))
+
+(def regex-groups (comp rest re-matches))
