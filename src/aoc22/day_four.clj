@@ -24,11 +24,14 @@
        (re-matches #"(\d+\-\d+),(\d+\-\d+)")
        rest))
 
-(comment
- (->> "resources/day-four-input.txt"
-      u/read-lines
-      (map split-pair)
-      (map (partial mapv ->range))
-      (keep fully-contained?)
-      count)
-  )
+(defn part-one []
+  (->> "resources/day-four-input.txt"
+       u/read-lines
+       (map split-pair)
+       (map (partial mapv ->range))
+       (keep fully-contained?)
+       count))
+
+(defn -main [part & _]
+  (when (#{:part-one} (keyword part))
+    (println (part-one))))
