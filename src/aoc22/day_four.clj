@@ -3,11 +3,13 @@
             [clojure.edn :as edn]
             [clojure.set :as set]))
 
-(defn- fully-contained? [[r1 r2]]
-  (let [sets (map set [r1 r2])]
-    (or (apply set/subset? sets)
-        (apply set/superset? sets)
-        nil)))
+(defn- fully-contained? [sets]
+  (or (apply set/subset? sets)
+      (apply set/superset? sets)
+      nil))
+
+(defn- with-overlap? [sets]
+  (seq (apply set/intersection sets)))
 
 (defn- range-inc-end [start end]
   (range start (inc end)))
@@ -24,12 +26,15 @@
        (re-matches #"(\d+\-\d+),(\d+\-\d+)")
        rest))
 
-(defn- part-one []
-  (->> "resources/day-four-input.txt"
-       u/read-lines
-       (map split-pair)
-       (map (partial mapv ->range))
-       (keep fully-contained?)
-       count))
+(defn- count-ranges [keep-fn]
+  (fn count-ranges* []
+    (->> "resources/day-four-input.txt"
+         u/read-lines
+         (map split-pair)
+         (map (partial mapv ->range))
+         (map (partial map set))
+         (keep keep-fn)
+         count)))
 
-(def -main (u/wrap-main {:part-one part-one}))
+(def -main (u/wrap-main {:part-one (count-ranges fully-contained?)
+                         :part-two (count-ranges with-overlap?)}))
