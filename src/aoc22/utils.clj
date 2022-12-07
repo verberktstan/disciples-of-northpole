@@ -13,3 +13,10 @@
 
 (defn val= [x]
   (comp #{x} val))
+
+(defn wrap-main [props]
+  (fn wrap-main* [part & _]
+    (let [f (get props (keyword part))]
+      (if f
+        (println (f))
+        (println "Can't run that part!")))))

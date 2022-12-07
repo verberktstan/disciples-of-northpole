@@ -22,22 +22,20 @@
   (let [i (int char)]
     (if (< i 97) (- i 38) (- i 96))))
 
-(comment
-  ;; Part one
-  ;; Sum the priorities of all items that appear in both compartiments of each rucksack.
+(defn part-one []
   (->> "resources/day-three-input.txt"
        u/read-lines
        (map split-rucksack)
        (map find-shared-item)
        (map priority)
-       (reduce +))
+       (reduce +)))
 
-  ;; Part two
-  ;; In groups of 3 rucksacks, find the shared item between those 3, and sum their priority.
+(defn part-two []
   (->> "resources/day-three-input.txt"
        u/read-lines
        (partition 3)
        (map find-shared-item)
        (map priority)
-       (reduce +))
-  )
+       (reduce +)))
+
+(def -main (u/wrap-main {:part-one part-one :part-two part-two}))

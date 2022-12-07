@@ -32,6 +32,4 @@
        (keep fully-contained?)
        count))
 
-(defn -main [part & _]
-  (when (#{:part-one} (keyword part))
-    (println (part-one))))
+(def -main (u/wrap-main {:part-one part-one}))
