@@ -25,9 +25,7 @@
 (defn- count-ranges [keep-fn]
   (fn count-ranges* []
     (->> "resources/day-four-input.txt"
-         u/read-lines
-         (map pair->range-sets)
-         (keep keep-fn)
+         (u/read-lines (comp (map pair->range-sets) (keep keep-fn)))
          count)))
 
 (def -main (u/wrap-main {:part-one (count-ranges fully-contained?)
