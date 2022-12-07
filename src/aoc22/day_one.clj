@@ -3,8 +3,6 @@
    [clojure.edn :as edn]
    [aoc22.utils :as u]))
 
-(def ^:private input-file "resources/day-one-input.txt")
-
 (defn- read-and-sum-calories [filename]
   (let [rasc (comp (map edn/read-string) (partition-by nil?) (keep (partial reduce +)))]
     (u/read-lines (partial into [] rasc) filename)))
@@ -15,5 +13,5 @@
 
 (def -main
   (u/wrap-main
-    {:part-one #(-> input-file read-and-sum-calories sum-max-calories)
-     :part-two #(-> input-file read-and-sum-calories (sum-max-calories 3))}))
+    {:part-one #(-> "resources/day-one-input.txt" read-and-sum-calories sum-max-calories)
+     :part-two #(-> "resources/day-one-input.txt" read-and-sum-calories (sum-max-calories 3))}))
