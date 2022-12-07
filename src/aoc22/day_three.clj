@@ -22,15 +22,12 @@
   (let [i (int char)]
     (if (< i 97) (- i 38) (- i 96))))
 
-(defn- part-one []
+(defn- sum-priorities-of-shared-items []
   (->> "resources/day-three-input.txt"
-       u/read-lines
-       (map split-rucksack)
-       (map find-shared-item)
-       (map priority)
+       (u/read-lines (comp (map split-rucksack) (map find-shared-item) (map priority)))
        (reduce +)))
 
-(defn- part-two []
+(defn- sum-priorities-of-group-badges []
   (->> "resources/day-three-input.txt"
        u/read-lines
        (partition 3)
@@ -38,4 +35,5 @@
        (map priority)
        (reduce +)))
 
-(def -main (u/wrap-main {:part-one part-one :part-two part-two}))
+(def -main (u/wrap-main {:part-one sum-priorities-of-shared-items
+                         :part-two sum-priorities-of-group-badges}))
