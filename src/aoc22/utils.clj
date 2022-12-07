@@ -6,10 +6,10 @@
 
 (defn read-lines
   ([filename]
-   (read-lines doall filename))
-  ([f filename]
+   (read-lines (map identity) filename))
+  ([transduce-fn filename]
    (with-open [reader (io/reader filename)]
-     (-> reader line-seq f))))
+     (->> reader line-seq (into [] transduce-fn)))))
 
 (defn key= [x]
   (comp #{x} key))

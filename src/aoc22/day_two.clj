@@ -44,11 +44,9 @@
 (defn- calculate-score [{:keys [my-play] :as plays}]
   (+ (shape-score my-play) (-> plays result round-score)))
 
-(defn- part-two []
+(defn- total-score-for-strategy-guide []
   (->> "resources/day-two-input.txt"
-       u/read-lines
-       (map parse-plays)
-       (map calculate-score)
+       (u/read-lines (comp (map parse-plays) (map calculate-score)))
        (reduce +)))
 
-(def -main (u/wrap-main {:part-two part-two}))
+(def -main (u/wrap-main {:part-two total-score-for-strategy-guide}))

@@ -5,7 +5,7 @@
 
 (defn- read-and-sum-calories [filename]
   (let [rasc (comp (map edn/read-string) (partition-by nil?) (keep (partial reduce +)))]
-    (u/read-lines (partial into [] rasc) filename)))
+    (u/read-lines rasc filename)))
 
 (defn- sum-max-calories
   ([calory-sums] (reduce max calory-sums))
