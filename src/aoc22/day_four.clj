@@ -4,9 +4,7 @@
             [clojure.set :as set]))
 
 (defn- fully-contained? [sets]
-  (or (apply set/subset? sets)
-      (apply set/superset? sets)
-      nil))
+  (or (apply set/subset? sets) (apply set/superset? sets) nil))
 
 (defn- with-overlap? [sets]
   (seq (apply set/intersection sets)))
@@ -17,19 +15,18 @@
 (def ^:private range-regex #"(\d+)\-(\d+)")
 
 (defn- ->range [s]
-  (->> (u/regex-groups range-regex s)
-       (map edn/read-string)
-       (apply range-inc-end)))
+  (->> s (u/regex-groups range-regex) (map edn/read-string) (apply range-inc-end)))
 
 (def ^:private pair-regex #"(\d+\-\d+),(\d+\-\d+)")
+
+(def ^:private pair->range-sets
+  (comp (partial map set) (partial mapv ->range) (partial u/regex-groups pair-regex)))
 
 (defn- count-ranges [keep-fn]
   (fn count-ranges* []
     (->> "resources/day-four-input.txt"
          u/read-lines
-         (map (partial u/regex-groups pair-regex))
-         (map (partial mapv ->range))
-         (map (partial map set))
+         (map pair->range-sets)
          (keep keep-fn)
          count)))
 
