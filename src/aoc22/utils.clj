@@ -4,9 +4,12 @@
 
 (def first-key (comp key first))
 
-(defn read-lines [filename]
-  (with-open [reader (io/reader filename)]
-    (doall (line-seq reader))))
+(defn read-lines
+  ([filename]
+   (read-lines doall filename))
+  ([f filename]
+   (with-open [reader (io/reader filename)]
+     (-> reader line-seq f))))
 
 (defn key= [x]
   (comp #{x} key))
