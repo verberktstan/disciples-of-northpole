@@ -37,23 +37,10 @@
 (defn- parse-instructions [m]
   (update m :instructions (partial map parse-instruction-line)))
 
-;; Cranes
+;; Cranes and moving crates
 (defprotocol Move
   "A simple protocol for moving crates around."
   (move [_ crates instructions] "Method to move crates according to instructions."))
-
-;; Moving of the crates
-(defn- move-crate [crates {:keys [from to]}]
-  (let [crate (first (get crates from))]
-    (-> crates
-        (update to seq)
-        (update from rest)
-        (update to conj crate))))
-
-(defrecord CrateMover9000 []
-  Move
-  (move [_ crates {:keys [move] :as instruction}]
-    (reduce move-crate crates (repeat move instruction))))
 
 (defn- move-crates [crates {:keys [move from to]}]
   (let [crates-to-move (take move (get crates from))]
@@ -61,6 +48,11 @@
         (update to seq)
         (update from (partial drop move))
         (update to (partial concat crates-to-move)))))
+
+(defrecord CrateMover9000 []
+  Move
+  (move [_ crates {:keys [move] :as instruction}]
+    (reduce move-crates crates (repeat move (assoc instruction :move 1)))))
 
 (defrecord CrateMover9001 []
   Move
