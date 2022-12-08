@@ -48,15 +48,16 @@
 (defn- move [crates {:keys [move] :as instruction}]
   (reduce move-crate crates (repeat move instruction)))
 
+(defn- read-all [filename]
+  (-> filename u/read-lines split-lines parse-setup parse-instructions))
+
 (defn- move-all [{:keys [setup instructions]}]
   (reduce move setup instructions))
 
-(comment
-  (->> (u/read-lines "resources/day-five-input.txt")
-      split-lines
-      parse-setup
-      parse-instructions
-      move-all
-      (sort-by key)
-      (map (comp first val)))
-  )
+(defn- top-crates [crates]
+  (->> crates (sort-by key) (map (comp first val)) (apply str)))
+
+(def -main (u/wrap-main {:part-one #(-> "resources/day-five-input.txt"
+                                        read-all
+                                        move-all
+                                        top-crates)}))
