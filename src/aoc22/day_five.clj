@@ -37,6 +37,11 @@
 (defn- parse-instructions [m]
   (update m :instructions (partial map parse-instruction-line)))
 
+;; Cranes
+(defprotocol Move
+  "A simple protocol for moving crates around."
+  (move [_ crates instructions] "Method to move crates according to instructions."))
+
 ;; Moving of the crates
 (defn- move-crate [crates {:keys [from to]}]
   (let [crate (first (get crates from))]
@@ -45,6 +50,11 @@
         (update from rest)
         (update to conj crate))))
 
+(defrecord CrateMover9000 []
+  Move
+  (move [_ crates {:keys [move] :as instruction}]
+    (reduce move-crate crates (repeat move instruction))))
+
 (defn- move-crates [crates {:keys [move from to]}]
   (let [crates-to-move (take move (get crates from))]
     (-> crates
@@ -52,21 +62,16 @@
         (update from (partial drop move))
         (update to (partial concat crates-to-move)))))
 
-(defn- move [mover]
-  (if (#{:crate-mover-9000} mover)
-    (fn move-9000 [crates {:keys [move] :as instruction}]
-      (reduce move-crate crates (repeat move instruction)))
-    (fn move-9001 [crates instruction]
-      (move-crates crates instruction))))
+(defrecord CrateMover9001 []
+  Move
+  (move [_ crates instruction]
+    (move-crates crates instruction)))
+
+(defn- move-with [{:keys [setup instructions]} mover]
+  (reduce (partial move mover) setup instructions))
 
 (defn- read-all [filename]
   (-> filename u/read-lines split-lines parse-setup parse-instructions))
-
-(defn- crate-mover-9000 [{:keys [setup instructions]}]
-  (reduce (move :crate-mover-9000) setup instructions))
-
-(defn- crate-mover-9001 [{:keys [setup instructions]}]
-  (reduce (move :crate-mover-9001) setup instructions))
 
 (defn- top-crates [crates]
   (->> crates (sort-by key) (map (comp first val)) (apply str)))
@@ -74,9 +79,9 @@
 (def -main
   (u/wrap-main {:part-one #(-> "resources/day-five-input.txt"
                                read-all
-                               crate-mover-9000
+                               (move-with (CrateMover9000.))
                                top-crates)
                 :part-two #(-> "resources/day-five-input.txt"
                                read-all
-                               crate-mover-9001
+                               (move-with (CrateMover9001.))
                                top-crates)}))
