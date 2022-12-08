@@ -10,16 +10,26 @@
 (defn- parse-setup-line [s]
   (let [sections (partition-all 4 s)]
     (->> (map parse-crate sections)
-         (zipmap (range)))))
+         (zipmap (range 1 10)))))
+
+(defn- parse-int [s]
+  (try
+    (Integer/parseInt s)
+    (catch NumberFormatException _)))
+
+(defn- parse-instruction-line [s]
+  (->> (str/split s #" ")
+       (keep parse-int)
+       (zipmap [:move :from :to])))
 
 (defn- split-lines [lines]
   {:setup (take-while (complement #{""}) lines)
    :instructions (drop-while #(not (str/starts-with? % "move")) lines)})
 
 (comment
-  (u/read-lines "resources/day-five-input.txt")
   (-> (u/read-lines "resources/day-five-input.txt")
       split-lines
       (update :setup (partial map parse-setup-line))
-      (update :setup (partial apply merge-with str)))
+      (update :setup (partial apply merge-with str))
+      (update :instructions (partial map parse-instruction-line)))
   )
