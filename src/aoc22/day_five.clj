@@ -36,6 +36,7 @@
 
 (defn- parse-instructions [m]
   (update m :instructions (partial map parse-instruction-line)))
+
 ;; Moving of the crates
 (defn- move-crate [crates {:keys [from to]}]
   (let [crate (first (get crates from))]
@@ -51,10 +52,11 @@
   (reduce move setup instructions))
 
 (comment
-  (-> (u/read-lines "resources/day-five-input.txt")
+  (->> (u/read-lines "resources/day-five-input.txt")
       split-lines
       parse-setup
       parse-instructions
-      move-all)
-
+      move-all
+      (sort-by key)
+      (map (comp first val)))
   )
