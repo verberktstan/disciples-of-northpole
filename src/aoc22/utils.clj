@@ -25,3 +25,6 @@
         (println "Can't run that part!")))))
 
 (def regex-groups (comp rest re-matches))
+
+(defn parse-int [s]
+  (try (Integer/parseInt s) (catch NumberFormatException _)))

@@ -13,11 +13,8 @@
     (->> (map parse-crate sections) (zipmap (range 1 10)))))
 
 ;; Parsing instructions
-(defn- parse-int [s]
-  (try (Integer/parseInt s) (catch NumberFormatException _)))
-
 (defn- parse-instruction-line [s]
-  (->> (str/split s #" ") (keep parse-int) (zipmap [:move :from :to])))
+  (->> (str/split s #" ") (keep u/parse-int) (zipmap [:move :from :to])))
 
 ;; Split lines into crate setup and instruction lines
 (defn- split-lines [lines]
