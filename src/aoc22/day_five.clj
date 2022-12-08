@@ -10,19 +10,14 @@
 
 (defn- parse-setup-line [s]
   (let [sections (partition-all 4 s)]
-    (->> (map parse-crate sections)
-         (zipmap (range 1 10)))))
+    (->> (map parse-crate sections) (zipmap (range 1 10)))))
 
 ;; Parsing instructions
 (defn- parse-int [s]
-  (try
-    (Integer/parseInt s)
-    (catch NumberFormatException _)))
+  (try (Integer/parseInt s) (catch NumberFormatException _)))
 
 (defn- parse-instruction-line [s]
-  (->> (str/split s #" ")
-       (keep parse-int)
-       (zipmap [:move :from :to])))
+  (->> (str/split s #" ") (keep parse-int) (zipmap [:move :from :to])))
 
 ;; Split lines into crate setup and instruction lines
 (defn- split-lines [lines]
@@ -68,12 +63,8 @@
 (defn- top-crates [crates]
   (->> crates (sort-by key) (map (comp first val)) (apply str)))
 
-(def -main
-  (u/wrap-main {:part-one #(-> "resources/day-five-input.txt"
-                               read-all
-                               (move-with (CrateMover9000.))
-                               top-crates)
-                :part-two #(-> "resources/day-five-input.txt"
-                               read-all
-                               (move-with (CrateMover9001.))
-                               top-crates)}))
+(defn- process-crates [crane]
+  #(-> "resources/day-five-input.txt" read-all (move-with crane) top-crates))
+
+(def -main (u/wrap-main {:part-one (process-crates (CrateMover9000.))
+                         :part-two (process-crates (CrateMover9001.))}))
