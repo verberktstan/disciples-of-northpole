@@ -45,19 +45,38 @@
         (update from rest)
         (update to conj crate))))
 
-(defn- move [crates {:keys [move] :as instruction}]
-  (reduce move-crate crates (repeat move instruction)))
+(defn- move-crates [crates {:keys [move from to]}]
+  (let [crates-to-move (take move (get crates from))]
+    (-> crates
+        (update to seq)
+        (update from (partial drop move))
+        (update to (partial concat crates-to-move)))))
+
+(defn- move [mover]
+  (if (#{:crate-mover-9000} mover)
+    (fn move-9000 [crates {:keys [move] :as instruction}]
+      (reduce move-crate crates (repeat move instruction)))
+    (fn move-9001 [crates instruction]
+      (move-crates crates instruction))))
 
 (defn- read-all [filename]
   (-> filename u/read-lines split-lines parse-setup parse-instructions))
 
-(defn- move-all [{:keys [setup instructions]}]
-  (reduce move setup instructions))
+(defn- crate-mover-9000 [{:keys [setup instructions]}]
+  (reduce (move :crate-mover-9000) setup instructions))
+
+(defn- crate-mover-9001 [{:keys [setup instructions]}]
+  (reduce (move :crate-mover-9001) setup instructions))
 
 (defn- top-crates [crates]
   (->> crates (sort-by key) (map (comp first val)) (apply str)))
 
-(def -main (u/wrap-main {:part-one #(-> "resources/day-five-input.txt"
-                                        read-all
-                                        move-all
-                                        top-crates)}))
+(def -main
+  (u/wrap-main {:part-one #(-> "resources/day-five-input.txt"
+                               read-all
+                               crate-mover-9000
+                               top-crates)
+                :part-two #(-> "resources/day-five-input.txt"
+                               read-all
+                               crate-mover-9001
+                               top-crates)}))
