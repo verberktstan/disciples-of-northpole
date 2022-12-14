@@ -10,28 +10,52 @@
      :sub-dir   (when (#{"dir"} a) b)
      :file-size (when-let [fs (u/parse-int a)] fs)}))
 
-(def conv (comp vec conj))
-(def drop-lastv (comp vec (partial drop-last)))
-(def takev (comp vec take))
+(defn- all-parent-dirs
+  "Returns a list of the paths of all parent directories."
+  [path]
+  (reduce (fn [m n] (->> path (take n) vec (conj m))) nil (range 1 (-> path count inc))))
 
-(defn- all-parent-dirs [path]
-  (reduce (fn [m n] (conj m (takev n path))) nil (range 1 (-> path count inc))))
+(defn- add-size-to-path [file-size]
+  (fn [m path]
+    (update m path + file-size)))
 
-(defn- follow-the-rabbit [{:keys [current-path] :as result} {:keys [command cmd-arg sub-dir file-size]}]
+(defn- follow-the-rabbit
+  "Returns a (flat) map with summed filesizes for every path."
+  [{:keys [current-path] :as result}
+   {:keys [command cmd-arg sub-dir file-size]}]
   (cond
     (and command (#{"/"} cmd-arg))  (assoc result :current-path ["/"])
-    (and command (#{".."} cmd-arg)) (update result :current-path drop-lastv)
+    (and command (#{".."} cmd-arg)) (update result :current-path (comp vec (partial drop-last)))
     (#{"cd"} command)               (update result :current-path conj cmd-arg)
-    sub-dir                         (update result (conv current-path sub-dir) #(or % 0))
-    file-size                       (reduce (fn [m path] (update m path + file-size)) result (all-parent-dirs current-path))
+    sub-dir                         (update result (concat current-path [sub-dir]) #(or % 0))
+    file-size                       (reduce (add-size-to-path file-size) result (all-parent-dirs current-path))
     :else                           result))
 
-(defn- part-one []
+(defn- paths-and-sizes
+  "Returns a map containing every map's path associated with their size."
+  []
   (->> (u/read-lines (map parse-line) "resources/day-seven-input.txt")
        (reduce follow-the-rabbit {["/"] 0})
        (filter (comp number? val))
+       (into {})))
+
+(defn- sum-sub100k
+  "Returns the sum of all sub 100k size directories."
+  [dirs-with-size]
+  (->> dirs-with-size
        (remove (comp (partial <= 100000) val))
        vals
        (reduce +)))
 
-(def -main (u/wrap-main {:part-one part-one}))
+(defn- required-space-to-be-deleted [used-space]
+  (let [total-size     70000000
+        space-required 30000000
+        free-space     (- total-size used-space)]
+    (when (> space-required free-space)
+      (- space-required free-space))))
+
+(def -main (u/wrap-main {:part-one (sum-sub100k (paths-and-sizes))}))
+
+(comment
+  (required-space-to-be-deleted 48381165)
+  )
