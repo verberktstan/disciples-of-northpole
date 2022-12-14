@@ -26,15 +26,12 @@
     file-size                       (reduce (fn [m path] (update m path + file-size)) result (all-parent-dirs current-path))
     :else                           result))
 
-(comment
-  (u/read-lines "resources/day-seven-input.txt")
-  (u/read-lines (map parse-line) "resources/day-seven-input.txt")
-
+(defn- part-one []
   (->> (u/read-lines (map parse-line) "resources/day-seven-input.txt")
        (reduce follow-the-rabbit {["/"] 0})
        (filter (comp number? val))
        (remove (comp (partial <= 100000) val))
        vals
-       (reduce +))
+       (reduce +)))
 
-  )
+(def -main (u/wrap-main {:part-one part-one}))
