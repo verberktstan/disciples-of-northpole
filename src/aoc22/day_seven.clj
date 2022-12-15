@@ -54,8 +54,16 @@
     (when (> space-required free-space)
       (- space-required free-space))))
 
-(def -main (u/wrap-main {:part-one (sum-sub100k (paths-and-sizes))}))
+(defn- smallest-viable-dir [paths-and-sizes]
+  (let [threshold (-> paths-and-sizes (get '("/")) required-space-to-be-deleted)]
+    (reduce-kv
+      (fn [m path size]
+        (if (>= size threshold)
+          (cond-> m
+            (< size (:size m) ) (assoc :size size :path path))
+          m))
+      {:size ##Inf}
+      paths-and-sizes)))
 
-(comment
-  (required-space-to-be-deleted 48381165)
-  )
+(def -main (u/wrap-main {:part-one #(sum-sub100k (paths-and-sizes))
+                         :part-two #(:size (smallest-viable-dir (paths-and-sizes)))}))
